@@ -6,7 +6,6 @@ class CreateDoorkeeperTables < ActiveRecord::Migration
       t.text    :redirect_uri, null: false
       t.string  :scopes,       null: false, default: ''
       t.text    :encrypted_secret
-      t.text    :encrypted_secret_iv
       t.timestamps
     end
 

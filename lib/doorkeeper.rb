@@ -74,15 +74,14 @@ module Doorkeeper
   def self.secure_compare(a, b)
     JWT.secure_compare(a, b)
   end
+
   def self.encrypt(plaintext)
     cipher = OpenSSL::Cipher::AES.new(256, :CBC)
     cipher.encrypt
     cipher.key = configured_secret
     iv = cipher.random_iv
     encrypted = cipher.update(plaintext) + cipher.final
-    iv_64 = [iv].pack('m')
-    encrypted_64 = [encrypted].pack('m')
-    [iv_64, encrypted_64]
+    "#{[iv].pack('m')}:#{[encrypted].pack('m')}"
   end
 
   def self.configured_secret
@@ -96,9 +95,11 @@ module Doorkeeper
     end
   end
 
-  def self.decrypt(iv_64, ciphertext_64)
+  def self.decrypt(ciphertext_64)
+    return unless ciphertext_64
+    iv_64, cipher_64 = ciphertext_64.split(':')
     iv = iv_64.unpack('m')[0]
-    ciphertext = ciphertext_64.unpack('m')[0]
+    ciphertext = cipher_64.unpack('m')[0]
     cipher = OpenSSL::Cipher::AES.new(256, :CBC)
     cipher.decrypt
     cipher.key = configured_secret

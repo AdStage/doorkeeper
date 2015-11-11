@@ -10,7 +10,7 @@ module Doorkeeper
       has_many :access_grants, dependent: :destroy, class_name: 'Doorkeeper::AccessGrant'
       has_many :access_tokens, dependent: :destroy, class_name: 'Doorkeeper::AccessToken'
 
-      validates :name, :encrypted_secret, :encrypted_secret_iv, :uid, presence: true
+      validates :name, :encrypted_secret, :uid, presence: true
       validates :uid, uniqueness: true
       validates :redirect_uri, redirect_uri: true
 
@@ -22,7 +22,7 @@ module Doorkeeper
     end
 
     def decrypted_secret
-      Doorkeeper.decrypt(encrypted_secret_iv, encrypted_secret)
+      Doorkeeper.decrypt(encrypted_secret)
     end
 
     def secret
@@ -32,12 +32,9 @@ module Doorkeeper
 
     def secret=(plaintext_secret)
       if plaintext_secret.blank?
-        self.encrypted_secret_iv = nil
         self.encrypted_secret = nil
       else
-        iv, ciphertext = Doorkeeper.encrypt(plaintext_secret)
-        self.encrypted_secret_iv = iv
-        self.encrypted_secret = ciphertext
+        self.encrypted_secret = Doorkeeper.encrypt(plaintext_secret)
       end
     end
 
@@ -71,5 +68,6 @@ module Doorkeeper
         self.secret = UniqueToken.generate
       end
     end
+
   end
 end

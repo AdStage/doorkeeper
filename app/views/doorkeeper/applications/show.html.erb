@@ -8,7 +8,7 @@
     <p><code id="application_id"><%= @application.uid %></code></p>
 
     <h4><%= t('.secret') %>:</h4>
-    <p><code id="secret"><%= @application.secret %></code></p>
+    <p><code id="secret"><%= @application.decrypted_secret %></code></p>
 
     <h4><%= t('.scopes') %>:</h4>
     <p><code id="scopes"><%= @application.scopes %></code></p>
