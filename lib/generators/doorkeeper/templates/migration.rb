@@ -3,9 +3,10 @@ class CreateDoorkeeperTables < ActiveRecord::Migration
     create_table :oauth_applications do |t|
       t.string  :name,         null: false
       t.string  :uid,          null: false
-      t.string  :secret,       null: false
       t.text    :redirect_uri, null: false
       t.string  :scopes,       null: false, default: ''
+      t.text    :encrypted_secret
+      t.text    :encrypted_secret_iv
       t.timestamps
     end
 

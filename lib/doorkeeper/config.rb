@@ -77,6 +77,10 @@ doorkeeper.
         @config.instance_variable_set('@access_token_methods', methods)
       end
 
+      def encryption_secret(secret)
+        @config.instance_variable_set('@encryption_secret', secret)
+      end
+
       def use_refresh_token
         @config.instance_variable_set('@refresh_token_enabled', true)
       end
@@ -189,6 +193,7 @@ doorkeeper.
     option :force_ssl_in_redirect_uri,      default: !Rails.env.development?
     option :grant_flows,                    default: %w(authorization_code client_credentials)
     option :access_token_generator,         default: "Doorkeeper::OAuth::Helpers::UniqueToken"
+    option :encryption_secret,              default: nil
 
     attr_reader :reuse_access_token
 

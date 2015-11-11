@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "railties", ">= 3.2"
+  s.add_dependency "jwt", "~> 1.5"
 
   s.add_development_dependency "rspec-rails", "~> 3.2.0"
   s.add_development_dependency "capybara", "~> 2.3.0"

@@ -96,19 +96,20 @@ module Doorkeeper
     it 'generate secret on create' do
       expect(new_application.secret).to be_nil
       new_application.save
-      expect(new_application.secret).not_to be_nil
+      expect(new_application.encrypted_secret).not_to be_blank
     end
 
     it 'generate secret on create if is blank string' do
       new_application.secret = ''
       new_application.save
-      expect(new_application.secret).not_to be_blank
+      expect(new_application.encrypted_secret).not_to be_blank
     end
 
     it 'generate secret on create unless one is set' do
       new_application.secret = secret
+      expect(new_application.encrypted_secret).not_to be_blank
       new_application.save
-      expect(new_application.secret).to eq(secret)
+      expect(new_application.decrypted_secret).to eq(secret)
     end
 
     it 'is invalid without secret' do

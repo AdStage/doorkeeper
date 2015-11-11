@@ -48,6 +48,10 @@ require 'doorkeeper/rails/helpers'
 
 require 'doorkeeper/orm/active_record'
 
+require 'openssl'
+require 'base64'
+require 'jwt'
+
 module Doorkeeper
   def self.configured?
     @config.present?
@@ -63,5 +67,42 @@ module Doorkeeper
 
   def self.authenticate(request, methods = Doorkeeper.configuration.access_token_methods)
     OAuth::Token.authenticate(request, *methods)
+  end
+
+  # TODO:
+  # Where do these belong?
+  def self.secure_compare(a, b)
+    JWT.secure_compare(a, b)
+  end
+  def self.encrypt(plaintext)
+    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
+    cipher.encrypt
+    cipher.key = configured_secret
+    iv = cipher.random_iv
+    encrypted = cipher.update(plaintext) + cipher.final
+    iv_64 = [iv].pack('m')
+    encrypted_64 = [encrypted].pack('m')
+    [iv_64, encrypted_64]
+  end
+
+  def self.configured_secret
+    secret = Doorkeeper.configuration.encryption_secret
+    if secret
+      secret
+    else
+      @random ||= SecureRandom.hex(36)
+      warn "Falling back to randomly configured secret: #{@random}"
+      @random
+    end
+  end
+
+  def self.decrypt(iv_64, ciphertext_64)
+    iv = iv_64.unpack('m')[0]
+    ciphertext = ciphertext_64.unpack('m')[0]
+    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
+    cipher.decrypt
+    cipher.key = configured_secret
+    cipher.iv = iv
+    cipher.update(ciphertext) + cipher.final
   end
 end

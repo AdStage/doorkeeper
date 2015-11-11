@@ -2,6 +2,8 @@ Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
   orm DOORKEEPER_ORM
 
+  encryption_secret SecureRandom.hex(36)
+
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
     # Put your resource owner authentication logic here.
