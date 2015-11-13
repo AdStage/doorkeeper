@@ -54,6 +54,16 @@ describe 'Authorization Code Flow Errors', 'after authorization' do
     should_have_json 'error_description', translated_error_message('invalid_grant')
   end
 
+  it 'returns :invalid_grant error when posting with invalid client' do
+    # First successful request
+    authorization_code_exists application: FactoryGirl.create(:application)
+    post token_endpoint_url(code: @authorization.token, client: @client)
+
+    should_not_have_json 'access_token'
+    should_have_json 'error', 'invalid_grant'
+    should_have_json 'error_description', translated_error_message('invalid_grant')
+  end
+
   it 'returns :invalid_grant error for invalid grant code' do
     post token_endpoint_url(code: 'invalid', client: @client)
 

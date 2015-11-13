@@ -138,7 +138,8 @@ describe Doorkeeper::AuthorizationsController, 'implicit grant flow' do
       expect(response.location).to match(/oauth\/authorize\//)
     end
 
-    it 'should issue a grant' do
+    it 'should issue a grant via url' do
+      expect(response.location.split('/').last).to be_a_valid_jwt
       expect(Doorkeeper::AccessGrant.count).to be 1
     end
 

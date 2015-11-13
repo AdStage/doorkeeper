@@ -75,13 +75,15 @@ module Doorkeeper
     JWT.secure_compare(a, b)
   end
 
-  def self.encrypt(plaintext)
-    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
-    cipher.encrypt
-    cipher.key = configured_secret
-    iv = cipher.random_iv
-    encrypted = cipher.update(plaintext) + cipher.final
-    "#{[iv].pack('m')}:#{[encrypted].pack('m')}"
+  def self.build_claims(claims)
+    JWT.encode claims, configured_secret, 'HS256'
+  end
+  def self.read_claims(token)
+    claims, header = JWT.decode token,
+                                configured_secret,
+                                true,
+                                {algorithm: 'HS256'}
+    claims
   end
 
   def self.configured_secret
@@ -93,6 +95,15 @@ module Doorkeeper
       warn "Falling back to randomly configured secret: #{@random}"
       @random
     end
+  end
+
+  def self.encrypt(plaintext)
+    cipher = OpenSSL::Cipher::AES.new(256, :CBC)
+    cipher.encrypt
+    cipher.key = configured_secret
+    iv = cipher.random_iv
+    encrypted = cipher.update(plaintext) + cipher.final
+    "#{[iv].pack('m')}:#{[encrypted].pack('m')}"
   end
 
   def self.decrypt(ciphertext_64)

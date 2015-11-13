@@ -15,6 +15,12 @@ module RequestSpecHelper
     expect(current_params[param]).to eq(value)
   end
 
+  def url_should_have_valid_jwt(param)
+    expect {
+      Doorkeeper.read_claims(current_params[param])
+    }.to_not raise_error
+  end
+
   def url_should_not_have_param(param)
     expect(current_params).not_to have_key(param)
   end

@@ -19,9 +19,9 @@ feature 'Skip authorization form' do
       visit authorization_endpoint_url(client: @client)
 
       i_should_not_see 'Authorize'
-      client_should_be_authorized @client
       i_should_be_on_client_callback @client
-      url_should_have_param 'code', Doorkeeper::AccessGrant.first.token
+      jwt_access_grant_should_exist_for(@client, @resource_owner)
+      url_should_have_valid_jwt 'code'
     end
 
     scenario 'does not skip authorization when scopes differ (new request has fewer scopes)' do
@@ -40,7 +40,7 @@ feature 'Skip authorization form' do
       client_is_authorized(@client, @resource_owner, scopes: 'public write')
       visit authorization_endpoint_url(client: @client, scope: 'public')
       click_on 'Authorize'
-      access_grant_should_have_scopes :public
+      jwt_access_grant_should_have_scopes :public
     end
 
     scenario 'doesn not skip authorization when scopes are greater' do
@@ -53,7 +53,7 @@ feature 'Skip authorization form' do
       client_is_authorized(@client, @resource_owner, scopes: 'public')
       visit authorization_endpoint_url(client: @client, scope: 'public write')
       click_on 'Authorize'
-      access_grant_should_have_scopes :public, :write
+      jwt_access_grant_should_have_scopes :public, :write
     end
   end
 end

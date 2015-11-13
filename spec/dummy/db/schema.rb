@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151111004254) do
+ActiveRecord::Schema.define(version: 20151112004254) do
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id",              null: false
@@ -22,21 +22,27 @@ ActiveRecord::Schema.define(version: 20151111004254) do
     t.datetime "created_at",                     null: false
     t.datetime "revoked_at"
     t.string   "scopes"
+    t.string   "jwt_identifier"
   end
 
+  add_index "oauth_access_grants", ["jwt_identifier"], name: "index_oauth_access_grants_on_jwt_identifier", unique: true
   add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true
 
   create_table "oauth_access_tokens", force: :cascade do |t|
     t.integer  "resource_owner_id"
     t.integer  "application_id"
-    t.string   "token",             null: false
+    t.string   "token",                  null: false
     t.string   "refresh_token"
     t.integer  "expires_in"
     t.datetime "revoked_at"
-    t.datetime "created_at",        null: false
+    t.datetime "created_at",             null: false
     t.string   "scopes"
+    t.string   "jwt_identifier"
+    t.string   "jwt_refresh_identifier"
   end
 
+  add_index "oauth_access_tokens", ["jwt_identifier"], name: "index_oauth_access_tokens_on_jwt_identifier", unique: true
+  add_index "oauth_access_tokens", ["jwt_refresh_identifier"], name: "index_oauth_access_tokens_on_jwt_refresh_identifier", unique: true
   add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
   add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true

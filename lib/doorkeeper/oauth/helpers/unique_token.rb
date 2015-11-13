@@ -7,6 +7,11 @@ module Doorkeeper
           token_size       = options.delete(:size)      || 32
           generator_method.call(token_size)
         end
+        def self.generate_jti(options = {})
+          generator_method = options.delete(:generator) || SecureRandom.method(:base64)
+          token_size       = options.delete(:size)      || 8
+          generator_method.call(token_size)
+        end
       end
     end
   end

@@ -12,11 +12,11 @@ feature 'Authorization Code Flow' do
     visit authorization_endpoint_url(client: @client)
     click_on 'Authorize'
 
-    access_grant_should_exist_for(@client, @resource_owner)
+    jwt_access_grant_should_exist_for(@client, @resource_owner)
 
     i_should_be_on_client_callback(@client)
 
-    url_should_have_param('code', Doorkeeper::AccessGrant.first.token)
+    url_should_have_valid_jwt('code')
     url_should_not_have_param('state')
     url_should_not_have_param('error')
   end
@@ -27,16 +27,16 @@ feature 'Authorization Code Flow' do
     visit authorization_endpoint_url(client: @client)
     click_on 'Authorize'
 
-    access_grant_should_exist_for(@client, @resource_owner)
+    jwt_access_grant_should_exist_for(@client, @resource_owner)
 
     i_should_see 'Authorization code:'
-    i_should_see Doorkeeper::AccessGrant.first.token
+    i_should_see Doorkeeper.build_claims(extract_url_access_grant)
   end
 
   scenario 'resource owner authorizes the client with state parameter set' do
     visit authorization_endpoint_url(client: @client, state: 'return-me')
     click_on 'Authorize'
-    url_should_have_param('code', Doorkeeper::AccessGrant.first.token)
+    url_should_have_valid_jwt('code')
     url_should_have_param('state', 'return-me')
   end
 
@@ -67,20 +67,20 @@ feature 'Authorization Code Flow' do
     scenario 'resource owner authorizes the client with default scopes' do
       visit authorization_endpoint_url(client: @client)
       click_on 'Authorize'
-      access_grant_should_exist_for(@client, @resource_owner)
-      access_grant_should_have_scopes :public
+      jwt_access_grant_should_exist_for(@client, @resource_owner)
+      jwt_access_grant_should_have_scopes :public
     end
 
     scenario 'resource owner authorizes the client with required scopes' do
       visit authorization_endpoint_url(client: @client, scope: 'public write')
       click_on 'Authorize'
-      access_grant_should_have_scopes :public, :write
+      jwt_access_grant_should_have_scopes :public, :write
     end
 
     scenario 'resource owner authorizes the client with required scopes (without defaults)' do
       visit authorization_endpoint_url(client: @client, scope: 'write')
       click_on 'Authorize'
-      access_grant_should_have_scopes :write
+      jwt_access_grant_should_have_scopes :write
     end
 
     scenario 'new access token matches required scopes' do

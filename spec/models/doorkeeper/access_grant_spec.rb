@@ -7,7 +7,7 @@ describe Doorkeeper::AccessGrant do
 
   it_behaves_like 'an accessible token'
   it_behaves_like 'a revocable token'
-  it_behaves_like 'a unique token' do
+  it_behaves_like 'a unique jwt' do
     let(:factory_name) { :access_grant }
   end
 
@@ -22,9 +22,15 @@ describe Doorkeeper::AccessGrant do
       expect(subject).not_to be_valid
     end
 
-    it 'is invalid without token' do
+    it 'is valid without token' do
       subject.save
       subject.token = nil
+      expect(subject).to be_valid
+    end
+
+    it 'is invalid without jwt_identifier' do
+      subject.save
+      subject.jwt_identifier = nil
       expect(subject).not_to be_valid
     end
 

@@ -50,3 +50,27 @@ shared_examples 'a unique token' do
     end
   end
 end
+
+shared_examples 'a unique jwt' do
+  describe :jwt_identifier do
+    it 'is generated before validation' do
+      expect { subject.valid? }.to change { subject.jwt_identifier }.from(nil)
+    end
+
+    it 'is not valid if jwt id exists' do
+      token1 = FactoryGirl.create factory_name
+      token2 = FactoryGirl.create factory_name
+      token2.jwt_identifier = token1.jwt_identifier
+      expect(token2).not_to be_valid
+    end
+
+    it 'expects database to throw an error when jwt ids are the same' do
+      token1 = FactoryGirl.create factory_name
+      token2 = FactoryGirl.create factory_name
+      token2.jwt_identifier = token1.jwt_identifier
+      expect do
+        token2.save!(validate: false)
+      end.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
+end
